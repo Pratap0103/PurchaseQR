@@ -115,8 +115,8 @@ const ProductView = () => {
                     <InfoRow label="Mfg Date" value={product.mfgDate} />
                 </InfoCard>
 
-                <InfoCard title="Purchase Details" icon={CreditCard} color="bg-green-500">
-                    <InfoRow label="Purchase Date" value={product.purchaseDate} />
+                <InfoCard title="Asset Details" icon={CreditCard} color="bg-green-500">
+                    <InfoRow label="Asset Date" value={product.assetDate} />
                     <InfoRow label="Invoice No" value={product.invoiceNo} />
                     <InfoRow label="Supplier" value={product.supplierName} />
                     <InfoRow label="Payment" value={product.paymentMode} />

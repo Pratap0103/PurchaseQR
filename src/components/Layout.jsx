@@ -40,7 +40,7 @@ const Layout = ({ children }) => {
                 )}
             >
                 <div className="p-6 border-b border-light-blue-100 flex items-center justify-between">
-                    <h1 className="text-xl font-bold text-light-blue-800">Purchase Sys</h1>
+                    <h1 className="text-xl font-bold text-light-blue-800">Asset Management System</h1>
                     <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-slate-500">
                         <X size={24} />
                     </button>
@@ -97,7 +97,7 @@ const Layout = ({ children }) => {
                 {/* Mobile Header */}
                 <header className="lg:hidden bg-white border-b border-light-blue-100 p-4 flex items-center justify-between">
                     <h1 className="text-lg font-bold text-slate-800">
-                        {navItems.find(i => i.path === location.pathname)?.name || 'Purchase System'}
+                        {navItems.find(i => i.path === location.pathname)?.name || 'Asset Management System'}
                     </h1>
                     <button
                         onClick={() => setIsSidebarOpen(true)}

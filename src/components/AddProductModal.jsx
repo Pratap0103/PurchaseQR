@@ -62,7 +62,7 @@ const AddProductModal = ({ isOpen, onClose }) => {
         // Section 1
         productName: '', category: '', type: '', brand: '', model: '', serialNo: '', sku: '', mfgDate: '', origin: '', status: 'Active',
         // Section 2
-        purchaseDate: '', invoiceNo: '', cost: '', quantity: '', supplierName: '', supplierPhone: '', supplierEmail: '', paymentMode: '',
+        assetDate: '', invoiceNo: '', assetValue: '', quantity: '', supplierName: '', supplierPhone: '', supplierEmail: '', paymentMode: '',
         // Section 3
         location: '', department: '', assignedTo: '', usageType: '', storageLoc: '', responsiblePerson: '',
         // Section 4
@@ -139,11 +139,11 @@ const AddProductModal = ({ isOpen, onClose }) => {
 
                         {/* SECTION 2 */}
                         <section>
-                            <SectionHeader title="SECTION 2: Purchase Information" />
+                            <SectionHeader title="SECTION 2: Asset Information" />
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <InputField label="Purchase Date" name="purchaseDate" type="date" value={formData.purchaseDate} onChange={handleChange} />
+                                <InputField label="Asset Date" name="assetDate" type="date" value={formData.assetDate} onChange={handleChange} />
                                 <InputField label="Invoice Number" name="invoiceNo" value={formData.invoiceNo} onChange={handleChange} />
-                                <InputField label="Purchase Cost" name="cost" type="number" value={formData.cost} onChange={handleChange} />
+                                <InputField label="Asset Cost" name="assetValue" type="number" value={formData.assetValue} onChange={handleChange} />
                                 <InputField label="Quantity" name="quantity" type="number" value={formData.quantity} onChange={handleChange} />
                                 <InputField label="Supplier Name" name="supplierName" value={formData.supplierName} onChange={handleChange} />
                                 <InputField label="Supplier Phone" name="supplierPhone" value={formData.supplierPhone} onChange={handleChange} />

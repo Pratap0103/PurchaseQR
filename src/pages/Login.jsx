@@ -22,7 +22,7 @@ const Login = () => {
     return (
         <div className="min-h-screen flex items-center justify-center bg-light-blue-50">
             <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md border border-light-blue-100">
-                <h2 className="text-3xl font-bold text-center text-light-blue-900 mb-8">Purchase Details</h2>
+                <h2 className="text-3xl font-bold text-center text-light-blue-900 mb-8">Asset Management System</h2>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {error && (

@@ -66,8 +66,8 @@ const generateDummyProducts = () => {
             mfgDate: `2024-${monthStr}-${dayStr}`,
             origin: origins[i % origins.length],
             status: i % 3 === 0 ? 'Inactive' : 'Active',
-            // Section 2: Purchase Information
-            purchaseDate: `2025-01-${dayStr}`,
+            // Section 2: Asset Information
+            assetDate: `2025-01-${dayStr}`,
             invoiceNo: `INV-2025-${String(1000 + i).padStart(5, '0')}`,
             cost: String(baseCost),
             quantity: String((i % 5) + 1),

@@ -38,7 +38,7 @@ const ProductCard = ({ product, onShowQR }) => (
         <div className="border-t pt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
             <div><span className="text-slate-500">Cost:</span> <span className="font-medium text-slate-900">₹{product.cost}</span></div>
             <div><span className="text-slate-500">Qty:</span> <span className="text-slate-700">{product.quantity}</span></div>
-            <div><span className="text-slate-500">Purchased:</span> <span className="text-slate-700">{product.purchaseDate}</span></div>
+            <div><span className="text-slate-500">Asset Date:</span> <span className="text-slate-700">{product.assetDate}</span></div>
             <div><span className="text-slate-500">Invoice:</span> <span className="text-slate-700">{product.invoiceNo}</span></div>
             <div><span className="text-slate-500">Supplier:</span> <span className="text-slate-700">{product.supplierName}</span></div>
             <div><span className="text-slate-500">Payment:</span> <span className="text-slate-700">{product.paymentMode}</span></div>
@@ -167,8 +167,8 @@ const AllProducts = () => {
                                 <th className="px-4 py-3">Mfg Date</th>
                                 <th className="px-4 py-3">Origin</th>
                                 <th className="px-4 py-3">Status</th>
-                                {/* Section 2: Purchase Info */}
-                                <th className="px-4 py-3">Purchase Date</th>
+                                {/* Section 2: Asset Info */}
+                                <th className="px-4 py-3">Asset Date</th>
                                 <th className="px-4 py-3">Invoice No</th>
                                 <th className="px-4 py-3 text-right">Cost</th>
                                 <th className="px-4 py-3">Qty</th>
@@ -222,7 +222,7 @@ const AllProducts = () => {
                                             </span>
                                         </td>
                                         {/* Section 2 */}
-                                        <td className="px-4 py-3 text-slate-600">{product.purchaseDate}</td>
+                                        <td className="px-4 py-3 text-slate-600">{product.assetDate}</td>
                                         <td className="px-4 py-3 text-slate-600">{product.invoiceNo}</td>
                                         <td className="px-4 py-3 text-right text-slate-900">₹{product.cost}</td>
                                         <td className="px-4 py-3 text-slate-600">{product.quantity}</td>
