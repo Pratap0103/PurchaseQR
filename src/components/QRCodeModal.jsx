@@ -7,7 +7,7 @@ const QRCodeModal = ({ isOpen, onClose, product }) => {
 
     // Create URL for the product view page
     const baseUrl = window.location.origin;
-    const productUrl = `${baseUrl}/product/${product.sn}`;
+    const productUrl = `${baseUrl}/#/product/${product.sn}`;
 
     const handleDownload = () => {
         const svg = document.getElementById('qr-code-svg');

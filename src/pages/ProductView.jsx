@@ -1,12 +1,13 @@
+// ProductView.jsx with Context usage
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import { useProduct } from '../context/ProductContext';
 import { Package, MapPin, Shield, Wrench, DollarSign, FileText, Building2, Tag, Globe, CreditCard, Clock, CheckCircle, XCircle, Calendar } from 'lucide-react';
 
 const ProductView = () => {
     const { productId } = useParams();
+    const { products } = useProduct(); // Access via Context ensures initialization
 
-    // Get product from localStorage
-    const products = JSON.parse(localStorage.getItem('products') || '[]');
     const product = products.find(p => p.sn === productId || p.id === parseInt(productId));
 
     if (!product) {

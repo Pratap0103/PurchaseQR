@@ -42,7 +42,7 @@ const BulkQRModal = ({ isOpen, onClose, products }) => {
 
         for (let i = 0; i < products.length; i++) {
             const product = products[i];
-            const productUrl = `${baseUrl}/product/${product.sn}`;
+            const productUrl = `${baseUrl}/#/product/${product.sn}`;
 
             // Calculate position
             const xPos = margin + currentCol * (colWidth + colGap);
@@ -104,6 +104,19 @@ const BulkQRModal = ({ isOpen, onClose, products }) => {
                     productName += '...';
                 }
                 pdf.text(productName, centerX, yOffset + qrSize + 10, { align: 'center' });
+
+                // Draw URL
+                pdf.setFontSize(6);
+                pdf.setTextColor(100);
+                let urlText = productUrl;
+                if (pdf.getTextWidth(urlText) > maxWidth) {
+                    while (pdf.getTextWidth(urlText + '...') > maxWidth && urlText.length > 0) {
+                        urlText = urlText.slice(0, -1);
+                    }
+                    urlText += '...';
+                }
+                pdf.text(urlText, centerX, yOffset + qrSize + 14, { align: 'center' });
+                pdf.setTextColor(0); // Reset color
             }
 
             // Move to next position
@@ -148,7 +161,7 @@ const BulkQRModal = ({ isOpen, onClose, products }) => {
                             <div key={product.id} className="bg-white p-4 rounded-xl border border-slate-200 text-center">
                                 <QRCodeSVG
                                     id={`bulk-qr-${product.id}`}
-                                    value={`${baseUrl}/product/${product.sn}`}
+                                    value={`${baseUrl}/#/product/${product.sn}`}
                                     size={120}
                                     level="M"
                                     includeMargin={true}
@@ -156,6 +169,10 @@ const BulkQRModal = ({ isOpen, onClose, products }) => {
                                 />
                                 <p className="font-bold text-light-blue-700 text-sm mt-2">{product.sn}</p>
                                 <p className="text-slate-600 text-xs truncate">{product.productName}</p>
+                                <div className="mt-2 text-[10px] text-slate-500 bg-slate-50 rounded p-1">
+                                    <span className="font-semibold block">Scan URL:</span>
+                                    <span className="break-all">{`${baseUrl}/#/product/${product.sn}`}</span>
+                                </div>
                             </div>
                         ))}
                     </div>

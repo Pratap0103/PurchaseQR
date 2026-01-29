@@ -40,7 +40,16 @@ const generateDummyProducts = () => {
     const products = [];
     for (let i = 0; i < 20; i++) {
         const prod = realProducts[i];
-        const baseCost = 5000 + Math.floor(Math.random() * 95000);
+        // Make numbers deterministic based on index `i`
+        // Base cost: 5000 + (val based on i)
+        const deterministicRandom = ((i * 123456) % 100) / 100;
+        const baseCost = 5000 + Math.floor(deterministicRandom * 95000);
+
+        // Deterministic dates
+        const month = (i % 12) + 1;
+        const day = (i % 28) + 1;
+        const dayStr = String(day).padStart(2, '0');
+        const monthStr = String(month).padStart(2, '0');
 
         products.push({
             id: i + 1,
@@ -51,18 +60,19 @@ const generateDummyProducts = () => {
             type: prod.type,
             brand: prod.brand,
             model: prod.model,
-            serialNo: `SR${Date.now().toString().slice(-8)}${i}`,
+            // Deterministic serial no
+            serialNo: `SR2025${String(i * 789).padStart(6, '0')}`,
             sku: `SKU-${prod.category.substring(0, 2).toUpperCase()}${1000 + i}`,
-            mfgDate: `2024-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}`,
+            mfgDate: `2024-${monthStr}-${dayStr}`,
             origin: origins[i % origins.length],
             status: i % 3 === 0 ? 'Inactive' : 'Active',
             // Section 2: Purchase Information
-            purchaseDate: `2025-01-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`,
+            purchaseDate: `2025-01-${dayStr}`,
             invoiceNo: `INV-2025-${String(1000 + i).padStart(5, '0')}`,
             cost: String(baseCost),
-            quantity: String(Math.floor(Math.random() * 5) + 1),
+            quantity: String((i % 5) + 1),
             supplierName: suppliers[i % suppliers.length],
-            supplierPhone: `98${Math.floor(10000000 + Math.random() * 90000000)}`,
+            supplierPhone: `98${String(10000000 + i * 12345).slice(0, 8)}`,
             supplierEmail: `sales@${suppliers[i % suppliers.length].toLowerCase().replace(/\s+/g, '')}.com`,
             paymentMode: paymentModes[i % paymentModes.length],
             // Section 3: Location & Ownership
@@ -81,7 +91,7 @@ const generateDummyProducts = () => {
             amcProvider: i % 3 === 0 ? `${prod.brand} Service Center` : '',
             amcStart: i % 3 === 0 ? '2025-01-01' : '',
             amcEnd: i % 3 === 0 ? '2026-01-01' : '',
-            serviceContact: `1800-${Math.floor(100 + Math.random() * 900)}-${Math.floor(1000 + Math.random() * 9000)}`,
+            serviceContact: `1800-${100 + i}-${1000 + i}`,
             // Section 5: Maintenance Configuration
             maintenanceRequired: i % 2 === 0 ? 'Yes' : 'No',
             maintenanceType: i % 2 === 0 ? (i % 4 === 0 ? 'Breakdown' : 'Preventive') : '',
@@ -92,14 +102,14 @@ const generateDummyProducts = () => {
             maintenanceNotes: i % 2 === 0 ? 'Regular preventive maintenance required' : '',
             // Section 7: Technical Specifications
             specs: [
-                { name: 'Weight', value: `${(Math.random() * 10 + 0.5).toFixed(1)} kg` },
-                { name: 'Dimensions', value: `${Math.floor(Math.random() * 50 + 10)}x${Math.floor(Math.random() * 40 + 10)}x${Math.floor(Math.random() * 30 + 5)} cm` }
+                { name: 'Weight', value: `${((i * 1.5) % 10 + 0.5).toFixed(1)} kg` },
+                { name: 'Dimensions', value: `${50 + (i % 10)}x${40 + (i % 5)}x${10 + (i % 5)} cm` }
             ],
             // Section 8: Financial & Depreciation
             assetValue: String(baseCost),
             depMethod: depMethods[i % depMethods.length],
-            depRate: String(Math.floor(Math.random() * 15) + 5),
-            assetLife: String(Math.floor(Math.random() * 7) + 3),
+            depRate: String((i % 15) + 5),
+            assetLife: String((i % 7) + 3),
             residualValue: String(Math.floor(baseCost * 0.1)),
             // Section 9: Notes & Remarks
             internalNotes: `Asset registered for ${departments[i % departments.length]} department`,
@@ -107,9 +117,10 @@ const generateDummyProducts = () => {
             condition: i % 5 === 0 ? 'Fair' : 'Good',
             // Section 10: System Information
             createdBy: 'admin',
-            createdDate: new Date().toISOString(),
+            // Use fixed date for demo consistency
+            createdDate: '2025-01-01T10:00:00.000Z',
             updatedBy: 'admin',
-            updatedDate: new Date().toISOString(),
+            updatedDate: '2025-01-01T10:00:00.000Z',
         });
     }
     return products;
