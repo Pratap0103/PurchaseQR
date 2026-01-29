@@ -1,12 +1,74 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { User, Shield, Bell, Palette, ChevronRight, Check } from 'lucide-react';
 
 const Settings = () => {
-    const { user } = useAuth();
+    const { user, getUsers, addUser, updateUser, deleteUser } = useAuth();
+    const [users, setUsers] = useState([]);
+    const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+    const [editingUser, setEditingUser] = useState(null);
+    const [deleteConfirmUser, setDeleteConfirmUser] = useState(null);
+
+    // Form states
+    const [formData, setFormData] = useState({ id: '', name: '', email: '', password: '', role: 'user' });
+    const [error, setError] = useState('');
+
+    React.useEffect(() => {
+        setUsers(getUsers());
+    }, []);
+
+    const refreshUsers = () => {
+        setUsers(getUsers());
+    };
+
+    const handleAddUser = (e) => {
+        e.preventDefault();
+        setError('');
+        if (!formData.id || !formData.name || !formData.password) {
+            setError('Please fill all required fields');
+            return;
+        }
+
+        if (addUser(formData)) {
+            setIsAddUserOpen(false);
+            setFormData({ id: '', name: '', email: '', password: '', role: 'user' });
+            refreshUsers();
+        } else {
+            setError('User ID already exists');
+        }
+    };
+
+    const handleUpdateUser = (e) => {
+        e.preventDefault();
+        setError('');
+
+        // Remove password if empty (to keep existing)
+        const updates = { ...formData };
+        if (!updates.password) delete updates.password;
+
+        if (updateUser(editingUser.id, updates)) {
+            setEditingUser(null);
+            setFormData({ id: '', name: '', email: '', password: '', role: 'user' });
+            refreshUsers();
+        } else {
+            setError('Failed to update user');
+        }
+    };
+
+    const handleDeleteUser = () => {
+        if (deleteUser(deleteConfirmUser.id)) {
+            setDeleteConfirmUser(null);
+            refreshUsers();
+        }
+    };
+
+    const openEditModal = (u) => {
+        setEditingUser(u);
+        setFormData({ ...u, password: '' }); // Don't show current password
+    };
 
     return (
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-4 sm:space-y-6 h-full overflow-y-auto pr-2 p-4 lg:p-6">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Settings</h1>
@@ -25,6 +87,71 @@ const Settings = () => {
                     </div>
                 </div>
             </div>
+
+            {/* User Management Section (Admin Only) */}
+            {user?.role === 'admin' && (
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
+                                <User size={20} className="text-indigo-600" />
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-slate-900">User Management</h3>
+                                <p className="text-xs text-slate-500">Manage system access</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => { setIsAddUserOpen(true); setFormData({ id: '', name: '', email: '', password: '', role: 'user' }); setError(''); }}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                        >
+                            + Add User
+                        </button>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm">
+                            <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-100">
+                                <tr>
+                                    <th className="px-4 py-3">User ID</th>
+                                    <th className="px-4 py-3">Name</th>
+                                    <th className="px-4 py-3">Role</th>
+                                    <th className="px-4 py-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {users.map(u => (
+                                    <tr key={u.id} className="hover:bg-slate-50">
+                                        <td className="px-4 py-3 font-medium text-slate-900">{u.id}</td>
+                                        <td className="px-4 py-3 text-slate-600">{u.name}</td>
+                                        <td className="px-4 py-3">
+                                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-700'}`}>
+                                                {u.role}
+                                            </span>
+                                        </td>
+                                        <td className="px-4 py-3 text-right space-x-2">
+                                            <button
+                                                onClick={() => openEditModal(u)}
+                                                className="text-indigo-600 hover:text-indigo-800 text-xs font-medium"
+                                            >
+                                                Edit
+                                            </button>
+                                            {u.id !== user.id && ( // Prevent deleting self
+                                                <button
+                                                    onClick={() => setDeleteConfirmUser(u)}
+                                                    className="text-red-600 hover:text-red-800 text-xs font-medium"
+                                                >
+                                                    Delete
+                                                </button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
 
             {/* Settings Sections - Card Style */}
             <div className="space-y-3">
@@ -153,6 +280,91 @@ const Settings = () => {
                     Save Changes
                 </button>
             </div>
+
+            {/* Modals */}
+            {/* Add User Modal */}
+            {isAddUserOpen && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+                        <h2 className="text-xl font-bold mb-4">Add New User</h2>
+                        {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4">{error}</div>}
+                        <form onSubmit={handleAddUser} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700">User ID</label>
+                                <input type="text" value={formData.id} onChange={e => setFormData({ ...formData, id: e.target.value })} className="w-full border rounded-lg px-3 py-2 mt-1" required />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700">Name</label>
+                                <input type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full border rounded-lg px-3 py-2 mt-1" required />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700">Password</label>
+                                <input type="password" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} className="w-full border rounded-lg px-3 py-2 mt-1" required />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700">Role</label>
+                                <select value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })} className="w-full border rounded-lg px-3 py-2 mt-1">
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            <div className="flex gap-3 pt-4">
+                                <button type="button" onClick={() => setIsAddUserOpen(false)} className="flex-1 px-4 py-2 border rounded-lg text-slate-600">Cancel</button>
+                                <button type="submit" className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg">Add User</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit User Modal */}
+            {editingUser && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+                        <h2 className="text-xl font-bold mb-4">Edit User</h2>
+                        {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4">{error}</div>}
+                        <form onSubmit={handleUpdateUser} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700">User ID</label>
+                                <input type="text" value={formData.id} disabled className="w-full border rounded-lg px-3 py-2 mt-1 bg-slate-100" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700">Name</label>
+                                <input type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full border rounded-lg px-3 py-2 mt-1" required />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700">New Password (leave blank to keep current)</label>
+                                <input type="password" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} className="w-full border rounded-lg px-3 py-2 mt-1" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700">Role</label>
+                                <select value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })} className="w-full border rounded-lg px-3 py-2 mt-1">
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            <div className="flex gap-3 pt-4">
+                                <button type="button" onClick={() => setEditingUser(null)} className="flex-1 px-4 py-2 border rounded-lg text-slate-600">Cancel</button>
+                                <button type="submit" className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg">Update User</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {deleteConfirmUser && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 text-center">
+                        <h2 className="text-xl font-bold mb-2">Delete User?</h2>
+                        <p className="text-slate-600 mb-6">Are you sure you want to delete <span className="font-semibold text-slate-900">{deleteConfirmUser.name}</span>? This action cannot be undone.</p>
+                        <div className="flex gap-3">
+                            <button onClick={() => setDeleteConfirmUser(null)} className="flex-1 px-4 py-2 border rounded-lg text-slate-600">Cancel</button>
+                            <button onClick={handleDeleteUser} className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

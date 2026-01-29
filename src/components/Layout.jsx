@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Package, Settings, Menu, X, LogOut, User } from 'lucide-react';
 import clsx from 'clsx';
+import Footer from './Footer';
 
 const Layout = ({ children }) => {
     const { user, logout } = useAuth();
@@ -22,7 +23,7 @@ const Layout = ({ children }) => {
     ];
 
     return (
-        <div className="flex h-screen bg-light-blue-50">
+        <div className="flex bg-slate-50 h-screen supports-[height:100dvh]:h-[100dvh] w-full overflow-hidden">
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div
@@ -106,8 +107,13 @@ const Layout = ({ children }) => {
                     </button>
                 </header>
 
-                <main className="flex-1 overflow-y-auto p-4 lg:p-8">
-                    {children}
+                <main className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                    <div className="flex-1 overflow-hidden flex flex-col">
+                        {children}
+                    </div>
+                    <div className="shrink-0 z-20 bg-white border-t border-slate-100">
+                        <Footer />
+                    </div>
                 </main>
             </div>
         </div>

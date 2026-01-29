@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import Footer from '../components/Footer';
 
 const Login = () => {
     const [id, setId] = useState('');
@@ -64,6 +65,9 @@ const Login = () => {
                     <p>Admin: admin / admin123</p>
                     <p>User: user / user123</p>
                 </div>
+            </div>
+            <div className="absolute bottom-0 w-full">
+                <Footer />
             </div>
         </div>
     );

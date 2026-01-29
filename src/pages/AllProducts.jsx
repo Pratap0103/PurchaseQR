@@ -66,20 +66,13 @@ const AllProducts = () => {
     const [isQRModalOpen, setIsQRModalOpen] = useState(false);
     const [isBulkQROpen, setIsBulkQROpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
+
     const [searchTerm, setSearchTerm] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
 
     const filteredProducts = products.filter(product =>
         product.productName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.sn?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.category?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-    const paginatedProducts = filteredProducts.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
     );
 
     const handleReloadDummy = () => {
@@ -94,8 +87,8 @@ const AllProducts = () => {
     };
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex-1 w-full min-h-0 flex flex-col gap-4 p-4 lg:p-6 overflow-hidden">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
                 <h1 className="text-2xl font-bold text-slate-900">All Products</h1>
                 <div className="flex flex-wrap gap-2">
                     <button
@@ -124,7 +117,7 @@ const AllProducts = () => {
             </div>
 
             {/* Search & Filter */}
-            <div className="flex gap-4">
+            <div className="flex gap-4 shrink-0">
                 <div className="relative flex-1 max-w-md">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                     <input
@@ -141,10 +134,11 @@ const AllProducts = () => {
                 </button>
             </div>
 
-            {/* Mobile Card View */}
-            <div className="md:hidden space-y-4">
-                {paginatedProducts.length > 0 ? (
-                    paginatedProducts.map((product) => (
+
+            {/* Mobile Card View (Scrollable) */}
+            <div className="md:hidden flex-1 overflow-y-auto space-y-4 pr-1">
+                {filteredProducts.length > 0 ? (
+                    filteredProducts.map((product) => (
                         <ProductCard key={product.id} product={product} onShowQR={handleShowQR} />
                     ))
                 ) : (
@@ -155,13 +149,13 @@ const AllProducts = () => {
             </div>
 
             {/* Desktop Table View - Full Width with Horizontal Scroll */}
-            <div className="hidden md:block bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-                <div className="overflow-x-auto">
+            <div className="hidden md:flex flex-1 min-h-0 flex-col bg-white rounded-t-xl shadow-sm border-x border-t border-slate-100 border-b overflow-hidden">
+                <div className="flex-1 overflow-auto w-full relative custom-scrollbar">
                     <table className="w-full text-left text-sm whitespace-nowrap">
-                        <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-100">
+                        <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-100 sticky top-0 z-20 shadow-sm">
                             <tr>
                                 {/* Actions */}
-                                <th className="px-4 py-3 sticky left-0 bg-slate-50 z-10">Actions</th>
+                                <th className="px-4 py-3 sticky left-0 top-0 z-30 bg-slate-50 drop-shadow-sm">Actions</th>
                                 {/* Section 1: Basic Info */}
                                 <th className="px-4 py-3">Serial No</th>
                                 <th className="px-4 py-3">Product Name</th>
@@ -199,8 +193,8 @@ const AllProducts = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                            {paginatedProducts.length > 0 ? (
-                                paginatedProducts.map((product) => (
+                            {filteredProducts.length > 0 ? (
+                                filteredProducts.map((product) => (
                                     <tr key={product.id} className="hover:bg-slate-50 transition-colors">
                                         {/* Actions - QR Code Button */}
                                         <td className="px-4 py-3 sticky left-0 bg-white">
@@ -263,33 +257,9 @@ const AllProducts = () => {
                     </table>
                 </div>
 
-                {/* Pagination */}
-                <div className="p-4 border-t border-slate-100 flex justify-between items-center text-sm text-slate-500">
-                    <div>Showing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, filteredProducts.length)} of {filteredProducts.length}</div>
-                    <div className="flex gap-2 items-center">
-                        <button
-                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                            disabled={currentPage === 1}
-                            className="p-2 border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-50"
-                        >
-                            <ChevronLeft size={16} />
-                        </button>
-                        <span className="px-3">Page {currentPage} of {totalPages || 1}</span>
-                        <button
-                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                            disabled={currentPage >= totalPages}
-                            className="p-2 border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-50"
-                        >
-                            <ChevronRight size={16} />
-                        </button>
-                    </div>
-                </div>
             </div>
 
-            {/* Mobile Showing count */}
-            <div className="md:hidden text-sm text-slate-500 text-center">
-                Showing {paginatedProducts.length} of {filteredProducts.length} products
-            </div>
+
 
             <AddProductModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
             <QRCodeModal

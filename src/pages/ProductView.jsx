@@ -2,6 +2,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useProduct } from '../context/ProductContext';
+import Footer from '../components/Footer';
 import { Package, MapPin, Shield, Wrench, DollarSign, FileText, Building2, Tag, Globe, CreditCard, Clock, CheckCircle, XCircle, Calendar } from 'lucide-react';
 
 const ProductView = () => {
@@ -192,6 +193,8 @@ const ProductView = () => {
                         by {product.createdBy}
                     </p>
                 </div>
+
+                <Footer />
             </div>
         </div>
     );

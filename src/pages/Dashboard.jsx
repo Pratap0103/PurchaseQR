@@ -43,7 +43,7 @@ const Dashboard = () => {
     ];
 
     return (
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-6 h-full overflow-y-auto pr-2 p-4 lg:p-6">
             {/* Header */}
             <div className="bg-gradient-to-r from-light-blue-500 to-light-blue-600 rounded-2xl p-4 sm:p-6 text-white">
                 <div className="flex items-center gap-3 mb-2">
