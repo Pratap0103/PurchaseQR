@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Upload, Plus, Trash2 } from 'lucide-react';
 import { useProduct } from '../context/ProductContext';
 
@@ -51,9 +51,9 @@ const SectionHeader = ({ title }) => (
     </h3>
 );
 
-const AddProductModal = ({ isOpen, onClose }) => {
-    const { addProduct } = useProduct();
-    const [activeTab, setActiveTab] = useState(0); // For optional tabbed view, or just scroll? 
+const AddProductModal = ({ isOpen, onClose, product = null }) => {
+    const { addProduct, updateProduct } = useProduct();
+    const [activeTab, setActiveTab] = useState(0);
     // Given 10 sections, a long scroll with clear headers is simpler, or tabs. 
     // Prompt says "pop-pop form", implies modal. 10 sections in a modal is a lot.
     // I will make it scrollable with a fixed header/footer.
@@ -75,7 +75,37 @@ const AddProductModal = ({ isOpen, onClose }) => {
         assetValue: '', depMethod: '', depRate: '', assetLife: '', residualValue: '',
         // Section 9
         internalNotes: '', usageRemarks: '', condition: '',
+        // Section 10 (Repair Details)
+        lastRepairDate: '', repairCost: '', partChanged: 'No', partNames: [], repairCount: '0', totalRepairCost: '0',
     });
+
+    useEffect(() => {
+        if (isOpen) {
+            if (product) {
+                // Edit Mode: Populate form with existing product data
+                setFormData({
+                    ...product,
+                    // Ensure arrays are initialized if missing
+                    specs: product.specs || [],
+                    partNames: product.partNames || [],
+                });
+            } else {
+                // Add Mode: Reset to empty/default
+                setFormData({
+                    productName: '', category: '', type: '', brand: '', model: '', serialNo: '', sku: '', mfgDate: '', origin: '', status: 'Active',
+                    assetDate: '', invoiceNo: '', assetValue: '', quantity: '', supplierName: '', supplierPhone: '', supplierEmail: '', paymentMode: '',
+                    location: '', department: '', assignedTo: '', usageType: '', storageLoc: '', responsiblePerson: '',
+                    warrantyAvailable: 'No', warrantyProvider: '', warrantyStart: '', warrantyEnd: '', amc: 'No', amcProvider: '', amcStart: '', amcEnd: '', serviceContact: '',
+                    maintenanceRequired: 'No', maintenanceType: '', frequency: '', nextService: '', priority: '', technician: '', maintenanceNotes: '',
+                    specs: [],
+                    depMethod: '', depRate: '', assetLife: '', residualValue: '',
+                    internalNotes: '', usageRemarks: '', condition: '',
+                    lastRepairDate: '', repairCost: '', partChanged: 'No', partNames: [], repairCount: '0', totalRepairCost: '0',
+                });
+            }
+        }
+    }, [isOpen, product]);
+
 
     if (!isOpen) return null;
 
@@ -99,18 +129,41 @@ const AddProductModal = ({ isOpen, onClose }) => {
         setFormData(prev => ({ ...prev, specs: newSpecs }));
     };
 
+    const handlePartNameChange = (index, value) => {
+        const newParts = [...formData.partNames];
+        newParts[index] = value;
+        setFormData(prev => ({ ...prev, partNames: newParts }));
+    };
+
+    const addPartName = () => {
+        if (formData.partNames.length < 5) {
+            setFormData(prev => ({ ...prev, partNames: [...prev.partNames, ''] }));
+        }
+    };
+
+    const removePartName = (index) => {
+        const newParts = formData.partNames.filter((_, i) => i !== index);
+        setFormData(prev => ({ ...prev, partNames: newParts }));
+    };
+
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        addProduct(formData);
+        if (product) {
+            updateProduct(product.id, formData);
+        } else {
+            addProduct(formData);
+        }
         onClose();
     };
+
 
     return (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl h-[90vh] flex flex-col">
                 {/* Header */}
                 <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-light-blue-50 rounded-t-xl">
-                    <h2 className="text-2xl font-bold text-light-blue-900">Add New Product</h2>
+                    <h2 className="text-2xl font-bold text-light-blue-900">{product ? 'Edit Product' : 'Add New Product'}</h2>
                     <button onClick={onClose} className="p-2 hover:bg-white rounded-full transition-colors text-slate-500">
                         <X size={24} />
                     </button>
@@ -266,6 +319,51 @@ const AddProductModal = ({ isOpen, onClose }) => {
                             </div>
                         </section>
 
+                        {/* SECTION 10: Repair Details */}
+                        <section>
+                            <SectionHeader title="SECTION 10: Repair Details" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <InputField label="Last Repair Date" name="lastRepairDate" type="date" value={formData.lastRepairDate} onChange={handleChange} />
+                                <InputField label="Last Repair Cost" name="repairCost" type="number" value={formData.repairCost} onChange={handleChange} />
+                                <InputField label="Repair Count" name="repairCount" type="number" value={formData.repairCount} onChange={handleChange} />
+                                <InputField label="Total Repair Cost" name="totalRepairCost" type="number" value={formData.totalRepairCost} onChange={handleChange} />
+
+                                <div className="col-span-1 md:col-span-2 lg:col-span-4 border-t border-slate-100 pt-4 mt-2">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <InputField label="Part Changed?" name="partChanged" type="select" options={['Yes', 'No']} value={formData.partChanged} onChange={handleChange} />
+                                        </div>
+
+                                        {formData.partChanged === 'Yes' && (
+                                            <div className="space-y-3">
+                                                <label className="text-sm font-medium text-slate-700 block mb-2">Part Names (Max 5)</label>
+                                                {formData.partNames.map((part, index) => (
+                                                    <div key={index} className="flex gap-2 items-center">
+                                                        <input
+                                                            type="text"
+                                                            value={part}
+                                                            onChange={(e) => handlePartNameChange(index, e.target.value)}
+                                                            className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-light-blue-500"
+                                                            placeholder={`Part Name ${index + 1}`}
+                                                        />
+                                                        <button type="button" onClick={() => removePartName(index)} className="p-2 text-red-500 hover:bg-red-50 rounded">
+                                                            <Trash2 size={18} />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                                {formData.partNames.length < 5 && (
+                                                    <button type="button" onClick={addPartName} className="flex items-center gap-2 text-sm text-light-blue-600 font-medium hover:text-light-blue-700 mt-2">
+                                                        <Plus size={16} /> Add Part Name
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+
                     </form>
                 </div>
 
@@ -283,7 +381,7 @@ const AddProductModal = ({ isOpen, onClose }) => {
                         form="product-form"
                         className="px-6 py-2 bg-light-blue-600 hover:bg-light-blue-700 text-white rounded-lg font-medium shadow-md transition-colors"
                     >
-                        Save Product
+                        {product ? 'Update Product' : 'Save Product'}
                     </button>
                 </div>
             </div>

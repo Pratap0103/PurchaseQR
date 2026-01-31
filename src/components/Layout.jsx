@@ -107,11 +107,9 @@ const Layout = ({ children }) => {
                     </button>
                 </header>
 
-                <main className="flex-1 flex flex-col min-h-0 overflow-hidden">
-                    <div className="flex-1 overflow-hidden flex flex-col">
-                        {children}
-                    </div>
-                    <div className="shrink-0 z-20 bg-white border-t border-slate-100">
+                <main className="flex-1 overflow-y-auto bg-slate-50 w-full flex flex-col items-stretch">
+                    {children}
+                    <div className="mt-auto">
                         <Footer />
                     </div>
                 </main>

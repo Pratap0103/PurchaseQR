@@ -1,61 +1,94 @@
 import React, { useState } from 'react';
-import { Plus, Search, Filter, RefreshCw, ChevronLeft, ChevronRight, QrCode, FileText } from 'lucide-react';
+import { Plus, Search, Filter, RefreshCw, ChevronLeft, ChevronRight, QrCode, FileText, Pencil } from 'lucide-react';
 import { useProduct } from '../context/ProductContext';
 import AddProductModal from '../components/AddProductModal';
 import QRCodeModal from '../components/QRCodeModal';
 import BulkQRModal from '../components/BulkQRModal';
 
-// Product Card for Mobile View - Now with more details and QR button
-const ProductCard = ({ product, onShowQR }) => (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 space-y-3">
+// Product Card for Mobile View - RICH & DETAILED
+const ProductCard = ({ product, onShowQR, onEdit }) => (
+    <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 space-y-4">
+        {/* Header: SN & Actions */}
         <div className="flex items-center justify-between">
-            <span className="font-bold text-light-blue-700">{product.sn}</span>
-            <div className="flex items-center gap-2">
-                <button
-                    onClick={() => onShowQR(product)}
-                    className="p-1.5 text-light-blue-600 hover:bg-light-blue-50 rounded-lg transition-colors"
-                    title="View QR Code"
-                >
-                    <QrCode size={18} />
+            <span className="font-mono font-bold text-light-blue-600 bg-light-blue-50 px-2 py-0.5 rounded text-sm">{product.sn}</span>
+            <div className="flex items-center gap-1">
+                <button onClick={() => onEdit(product)} className="p-2 text-slate-500 hover:bg-slate-100 rounded-full">
+                    <Pencil size={16} />
                 </button>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-800'
-                    }`}>
+                <button onClick={() => onShowQR(product)} className="p-2 text-light-blue-600 hover:bg-light-blue-50 rounded-full">
+                    <QrCode size={16} />
+                </button>
+                <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${product.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                     {product.status}
                 </span>
             </div>
         </div>
-        <h3 className="font-semibold text-slate-900 text-lg">{product.productName}</h3>
 
-        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-            <div><span className="text-slate-500">Category:</span> <span className="text-slate-700">{product.category}</span></div>
-            <div><span className="text-slate-500">Type:</span> <span className="text-slate-700">{product.type}</span></div>
-            <div><span className="text-slate-500">Brand:</span> <span className="text-slate-700">{product.brand}</span></div>
-            <div><span className="text-slate-500">Model:</span> <span className="text-slate-700">{product.model}</span></div>
-            <div><span className="text-slate-500">SKU:</span> <span className="text-slate-700">{product.sku}</span></div>
-            <div><span className="text-slate-500">Origin:</span> <span className="text-slate-700">{product.origin}</span></div>
+        {/* Title & Brand */}
+        <div>
+            <h3 className="font-bold text-slate-900 text-base leading-tight">{product.productName}</h3>
+            <p className="text-xs text-slate-500 mt-0.5">{product.brand} • {product.model}</p>
         </div>
 
-        <div className="border-t pt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-            <div><span className="text-slate-500">Cost:</span> <span className="font-medium text-slate-900">₹{product.cost}</span></div>
-            <div><span className="text-slate-500">Qty:</span> <span className="text-slate-700">{product.quantity}</span></div>
-            <div><span className="text-slate-500">Asset Date:</span> <span className="text-slate-700">{product.assetDate}</span></div>
-            <div><span className="text-slate-500">Invoice:</span> <span className="text-slate-700">{product.invoiceNo}</span></div>
-            <div><span className="text-slate-500">Supplier:</span> <span className="text-slate-700">{product.supplierName}</span></div>
-            <div><span className="text-slate-500">Payment:</span> <span className="text-slate-700">{product.paymentMode}</span></div>
+        {/* 3-Column Key Stats */}
+        <div className="grid grid-cols-3 gap-2 py-3 border-t border-b border-slate-50">
+            <div className="text-center">
+                <p className="text-[10px] text-slate-400 uppercase tracking-wide">Location</p>
+                <p className="text-xs font-semibold text-slate-700 truncate">{product.location}</p>
+            </div>
+            <div className="text-center border-l border-slate-100">
+                <p className="text-[10px] text-slate-400 uppercase tracking-wide">Dept</p>
+                <p className="text-xs font-semibold text-slate-700 truncate">{product.department}</p>
+            </div>
+            <div className="text-center border-l border-slate-100">
+                <p className="text-[10px] text-slate-400 uppercase tracking-wide">Value</p>
+                <p className="text-xs font-semibold text-green-700">₹{product.assetValue}</p>
+            </div>
         </div>
 
-        <div className="border-t pt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-            <div><span className="text-slate-500">Location:</span> <span className="text-slate-700">{product.location}</span></div>
-            <div><span className="text-slate-500">Dept:</span> <span className="text-slate-700">{product.department}</span></div>
-            <div><span className="text-slate-500">Assigned:</span> <span className="text-slate-700">{product.assignedTo}</span></div>
-            <div><span className="text-slate-500">Responsible:</span> <span className="text-slate-700">{product.responsiblePerson}</span></div>
-        </div>
+        {/* Details List */}
+        <div className="space-y-2 text-xs">
+            <div className="flex justify-between">
+                <span className="text-slate-500">Asset Date:</span>
+                <span className="text-slate-700 font-medium">{product.assetDate}</span>
+            </div>
+            <div className="flex justify-between">
+                <span className="text-slate-500">Warranty:</span>
+                <span className={`font-medium ${product.warrantyAvailable === 'Yes' ? 'text-green-600' : 'text-slate-400'}`}>
+                    {product.warrantyAvailable === 'Yes' ? `Yes (Till ${product.warrantyEnd || '-'})` : 'No'}
+                </span>
+            </div>
 
-        <div className="border-t pt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-            <div><span className="text-slate-500">Warranty:</span> <span className="text-slate-700">{product.warrantyAvailable}</span></div>
-            <div><span className="text-slate-500">AMC:</span> <span className="text-slate-700">{product.amc}</span></div>
-            <div><span className="text-slate-500">Maintenance:</span> <span className="text-slate-700">{product.maintenanceRequired}</span></div>
-            <div><span className="text-slate-500">Priority:</span> <span className="text-slate-700">{product.priority || '-'}</span></div>
+            {/* Repair Highlight Section */}
+            <div className="bg-slate-50 rounded-lg p-2 mt-2 space-y-1.5">
+                <div className="flex justify-between items-center border-b border-slate-200 pb-1 mb-1">
+                    <span className="font-semibold text-slate-600">Repair History</span>
+                    <span className="bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-bold">{product.repairCount} Repairs</span>
+                </div>
+                <div className="flex justify-between">
+                    <span className="text-slate-500">Last Repair:</span>
+                    <span className="text-slate-700">{product.lastRepairDate || 'Never'}</span>
+                </div>
+                {product.repairCost && (
+                    <div className="flex justify-between">
+                        <span className="text-slate-500">Last Cost:</span>
+                        <span className="text-red-600 font-medium">₹{product.repairCost}</span>
+                    </div>
+                )}
+                {product.partChanged === 'Yes' && (
+                    <div className="pt-1">
+                        <span className="text-slate-500 block mb-1">Parts Changed:</span>
+                        <div className="flex flex-wrap gap-1">
+                            {(product.partNames || []).slice(0, 3).map((p, i) => (
+                                <span key={i} className="text-[10px] bg-white border border-slate-200 px-1.5 py-0.5 rounded text-slate-600">
+                                    {p}
+                                </span>
+                            ))}
+                            {(product.partNames?.length > 3) && <span className="text-[10px] text-slate-400 self-center">+{product.partNames.length - 3} more</span>}
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     </div>
 );
@@ -66,6 +99,7 @@ const AllProducts = () => {
     const [isQRModalOpen, setIsQRModalOpen] = useState(false);
     const [isBulkQROpen, setIsBulkQROpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [editingProduct, setEditingProduct] = useState(null);
 
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -86,52 +120,69 @@ const AllProducts = () => {
         setIsQRModalOpen(true);
     };
 
+    const handleEditProduct = (product) => {
+        setEditingProduct(product);
+        setIsModalOpen(true);
+    };
+
+    const handleAddProduct = () => {
+        setEditingProduct(null);
+        setIsModalOpen(true);
+    };
+
     return (
         <div className="flex-1 w-full min-h-0 flex flex-col gap-4 p-4 lg:p-6 overflow-hidden">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
-                <h1 className="text-2xl font-bold text-slate-900">All Products</h1>
-                <div className="flex flex-wrap gap-2">
-                    <button
-                        onClick={handleReloadDummy}
-                        className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg flex items-center gap-2 transition-colors"
-                        title="Reload dummy data"
-                    >
-                        <RefreshCw size={18} />
-                    </button>
-                    <button
-                        onClick={() => setIsBulkQROpen(true)}
-                        className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-colors"
-                    >
-                        <FileText size={18} />
-                        <span className="hidden sm:inline">Generate QR Codes</span>
-                        <span className="sm:hidden">QR PDF</span>
-                    </button>
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="bg-light-blue-600 hover:bg-light-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-colors"
-                    >
-                        <Plus size={20} />
-                        Add Product
-                    </button>
-                </div>
-            </div>
+            {/* Top Toolbar */}
+            <div className="flex flex-col gap-3 shrink-0">
+                <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-3">
+                    {/* Title hidden on mobile to avoid double header */}
+                    <h1 className="text-2xl font-bold text-slate-900 hidden lg:block">All Products</h1>
 
-            {/* Search & Filter */}
-            <div className="flex gap-4 shrink-0">
-                <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input
-                        type="text"
-                        placeholder="Search products..."
-                        value={searchTerm}
-                        onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-light-blue-500"
-                    />
+                    {/* Actions Group */}
+                    <div className="flex items-center gap-2 w-full lg:w-auto">
+                        <button
+                            onClick={handleReloadDummy}
+                            className="bg-white hover:bg-slate-50 text-slate-600 p-2.5 rounded-xl flex items-center justify-center transition-colors border border-slate-200 shadow-sm"
+                            title="Reload Data"
+                        >
+                            <RefreshCw size={20} />
+                        </button>
+
+                        <button
+                            onClick={() => setIsBulkQROpen(true)}
+                            className="bg-purple-50 text-purple-700 hover:bg-purple-100 p-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors border border-purple-100 shadow-sm"
+                            title="Generate QR PDF"
+                        >
+                            <FileText size={20} />
+                            <span className="hidden sm:inline font-medium">QR PDF</span>
+                        </button>
+
+                        <button
+                            onClick={handleAddProduct}
+                            className="flex-1 lg:flex-none bg-light-blue-600 hover:bg-light-blue-700 text-white px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 shadow-sm transition-colors font-medium shadow-light-blue-200/50"
+                        >
+                            <Plus size={20} />
+                            <span>Add Product</span>
+                        </button>
+                    </div>
                 </div>
-                <button className="px-4 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 flex items-center gap-2 bg-white">
-                    <Filter size={18} />
-                    <span className="hidden sm:inline">Filter</span>
-                </button>
+
+                {/* Search & Filter */}
+                <div className="flex gap-3">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                        <input
+                            type="text"
+                            placeholder="Search products..."
+                            value={searchTerm}
+                            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage?.(1); }}
+                            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-light-blue-500 transition-all font-medium text-slate-700 placeholder:text-slate-400"
+                        />
+                    </div>
+                    <button className="px-3.5 py-2.5 border border-slate-200 bg-white rounded-xl text-slate-600 hover:bg-slate-50 flex items-center gap-2 transition-colors shadow-sm">
+                        <Filter size={20} />
+                    </button>
+                </div>
             </div>
 
 
@@ -139,7 +190,7 @@ const AllProducts = () => {
             <div className="md:hidden flex-1 overflow-y-auto space-y-4 pr-1">
                 {filteredProducts.length > 0 ? (
                     filteredProducts.map((product) => (
-                        <ProductCard key={product.id} product={product} onShowQR={handleShowQR} />
+                        <ProductCard key={product.id} product={product} onShowQR={handleShowQR} onEdit={handleEditProduct} />
                     ))
                 ) : (
                     <div className="bg-white rounded-xl p-8 text-center text-slate-500">
@@ -185,6 +236,17 @@ const AllProducts = () => {
                                 {/* Section 5: Maintenance */}
                                 <th className="px-4 py-3">Maintenance</th>
                                 <th className="px-4 py-3">Priority</th>
+                                {/* Section 10: Repair History */}
+                                <th className="px-4 py-3">Last Repair</th>
+                                <th className="px-4 py-3 text-right">Last Cost</th>
+                                <th className="px-4 py-3">Part Chg?</th>
+                                <th className="px-4 py-3">Part 1</th>
+                                <th className="px-4 py-3">Part 2</th>
+                                <th className="px-4 py-3">Part 3</th>
+                                <th className="px-4 py-3">Part 4</th>
+                                <th className="px-4 py-3">Part 5</th>
+                                <th className="px-4 py-3 text-center">Count</th>
+                                <th className="px-4 py-3 text-right">Total Cost</th>
                                 {/* Section 8: Financial */}
                                 <th className="px-4 py-3 text-right">Asset Value</th>
                                 <th className="px-4 py-3">Dep. Method</th>
@@ -197,7 +259,14 @@ const AllProducts = () => {
                                 filteredProducts.map((product) => (
                                     <tr key={product.id} className="hover:bg-slate-50 transition-colors">
                                         {/* Actions - QR Code Button */}
-                                        <td className="px-4 py-3 sticky left-0 bg-white">
+                                        <td className="px-4 py-3 sticky left-0 bg-white flex items-center gap-1">
+                                            <button
+                                                onClick={() => handleEditProduct(product)}
+                                                className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                                                title="Edit Product"
+                                            >
+                                                <Pencil size={18} />
+                                            </button>
                                             <button
                                                 onClick={() => handleShowQR(product)}
                                                 className="p-2 text-light-blue-600 hover:bg-light-blue-50 rounded-lg transition-colors"
@@ -239,6 +308,19 @@ const AllProducts = () => {
                                         {/* Section 5 */}
                                         <td className="px-4 py-3 text-slate-600">{product.maintenanceRequired}</td>
                                         <td className="px-4 py-3 text-slate-600">{product.priority || '-'}</td>
+                                        {/* Section 10: Repair History */}
+                                        <td className="px-4 py-3 text-slate-600">{product.lastRepairDate || '-'}</td>
+                                        <td className="px-4 py-3 text-right text-slate-900">{product.repairCost ? `₹${product.repairCost}` : '-'}</td>
+                                        <td className="px-4 py-3 text-slate-600">{product.partChanged}</td>
+
+                                        <td className="px-4 py-3 text-slate-600 font-normal border-l border-slate-50">{product.partNames?.[0] || '-'}</td>
+                                        <td className="px-4 py-3 text-slate-600 font-normal">{product.partNames?.[1] || '-'}</td>
+                                        <td className="px-4 py-3 text-slate-600 font-normal">{product.partNames?.[2] || '-'}</td>
+                                        <td className="px-4 py-3 text-slate-600 font-normal">{product.partNames?.[3] || '-'}</td>
+                                        <td className="px-4 py-3 text-slate-600 font-normal border-r border-slate-50">{product.partNames?.[4] || '-'}</td>
+
+                                        <td className="px-4 py-3 text-center text-slate-600">{product.repairCount}</td>
+                                        <td className="px-4 py-3 text-right text-slate-900 font-medium">₹{product.totalRepairCost}</td>
                                         {/* Section 8 */}
                                         <td className="px-4 py-3 text-right text-slate-900">₹{product.assetValue}</td>
                                         <td className="px-4 py-3 text-slate-600">{product.depMethod}</td>
@@ -261,7 +343,11 @@ const AllProducts = () => {
 
 
 
-            <AddProductModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+            <AddProductModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                product={editingProduct}
+            />
             <QRCodeModal
                 isOpen={isQRModalOpen}
                 onClose={() => setIsQRModalOpen(false)}
@@ -272,7 +358,7 @@ const AllProducts = () => {
                 onClose={() => setIsBulkQROpen(false)}
                 products={products}
             />
-        </div>
+        </div >
     );
 };
 

@@ -115,6 +115,27 @@ const generateDummyProducts = () => {
             internalNotes: `Asset registered for ${departments[i % departments.length]} department`,
             usageRemarks: 'In regular use',
             condition: i % 5 === 0 ? 'Fair' : 'Good',
+            // Section 10: Repair Details - Dense & Realistic Data for UI Testing
+            // Section 10: Repair Details - Full Workflow Demo for 100% of Items
+            lastRepairDate: `2025-01-${String((i % 28) + 1).padStart(2, '0')}`,
+            repairCost: String(Math.floor(baseCost * (0.05 + (i % 10) * 0.01))),
+            partChanged: (i % 3 !== 0) ? 'Yes' : 'No', // 2/3rds have parts changed
+            partNames: (i % 3 !== 0) ?
+                [
+                    ['Power Supply', 'Fuse'],
+                    ['Motherboard'],
+                    ['Cooling Fan', 'Heat Sink', 'Thermal Paste'],
+                    ['Display Panel', 'Bezel'],
+                    ['Battery', 'Charging Port', 'Adapter'],
+                    ['Keyboard', 'Mousepad'],
+                    ['Hard Drive', 'Data Cable'],
+                    ['Ram Stick'],
+                    ['Motor', 'Belt', 'Pulley'],
+                    ['Sensor', 'Controller Board', 'Wiring Harness', 'Relay', 'Switch']
+                ][i % 10].slice(0, (i % 5) + 1) // Varied length 1-5
+                : [],
+            repairCount: String((i % 5) + 1), // 1 to 5 previous repairs
+            totalRepairCost: String(Math.floor(baseCost * (0.15 + (i % 3) * 0.1))),
             // Section 10: System Information
             createdBy: 'admin',
             // Use fixed date for demo consistency
@@ -134,10 +155,19 @@ export const ProductProvider = ({ children }) => {
         const storedProducts = localStorage.getItem('products');
         if (storedProducts) {
             const parsed = JSON.parse(storedProducts);
-            // Check if it's old format data (Product 1, Product 2 pattern)
-            const isOldData = parsed.length > 0 && parsed[0].productName && /^Product \d+$/.test(parsed[0].productName);
+
+            // Check for stale data: 
+            // 1. Old "Product 1" names
+            // 2. Missing or empty repair data (new logic has repairCount >= 1 for all items)
+            const isOldData = parsed.length > 0 && (
+                (parsed[0].productName && /^Product \d+$/.test(parsed[0].productName)) ||
+                !parsed[0].repairCount ||
+                parsed[0].repairCount === '0' ||
+                !parsed[0].lastRepairDate
+            );
+
             if (isOldData) {
-                // Replace with new realistic data
+                console.log("Stale data detected. Regenerating dummy data...");
                 const dummyData = generateDummyProducts();
                 setProducts(dummyData);
                 localStorage.setItem('products', JSON.stringify(dummyData));
@@ -174,6 +204,22 @@ export const ProductProvider = ({ children }) => {
         return newProduct;
     };
 
+    const updateProduct = (id, updatedData) => {
+        const updatedProducts = products.map(prod => {
+            if (prod.id === id) {
+                return {
+                    ...prod,
+                    ...updatedData,
+                    updatedBy: 'admin',
+                    updatedDate: new Date().toISOString(),
+                };
+            }
+            return prod;
+        });
+        setProducts(updatedProducts);
+        localStorage.setItem('products', JSON.stringify(updatedProducts));
+    };
+
     const clearAndReloadDummy = () => {
         const dummyData = generateDummyProducts();
         setProducts(dummyData);
@@ -181,7 +227,7 @@ export const ProductProvider = ({ children }) => {
     };
 
     return (
-        <ProductContext.Provider value={{ products, addProduct, clearAndReloadDummy }}>
+        <ProductContext.Provider value={{ products, addProduct, updateProduct, clearAndReloadDummy }}>
             {children}
         </ProductContext.Provider>
     );

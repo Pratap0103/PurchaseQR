@@ -29,57 +29,44 @@ const ProductView = () => {
     const isActive = product.status === 'Active';
 
     return (
-        <div className="min-h-screen bg-slate-50">
-            {/* Hero Header - Light Blue */}
-            <div className="bg-gradient-to-br from-light-blue-500 to-light-blue-600">
-                <div className="max-w-2xl mx-auto px-4 py-8 sm:py-12">
-                    <div className="text-center">
-                        {/* Status Badge */}
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur mb-4">
-                            {isActive ? (
-                                <CheckCircle size={14} className="text-white" />
-                            ) : (
-                                <XCircle size={14} className="text-white/70" />
-                            )}
-                            <span className="text-sm font-medium text-white">
-                                {product.status}
-                            </span>
+        <div className="h-screen bg-slate-50 flex flex-col overflow-hidden">
+            {/* Hero Header - Ultra Compact */}
+            <div className="bg-gradient-to-br from-light-blue-600 to-light-blue-700 shrink-0 shadow-sm z-20">
+                <div className="max-w-2xl mx-auto px-4 py-3">
+                    <div className="flex items-center justify-between">
+                        {/* Left: Title & SN */}
+                        <div className="text-left">
+                            <h1 className="text-lg font-bold text-white leading-tight mb-0.5">
+                                {product.productName}
+                            </h1>
+                            <div className="flex items-center gap-2">
+                                <span className="text-white/80 font-mono text-xs">{product.sn}</span>
+                                <span className="text-white/60 text-[10px]">• {product.brand}</span>
+                            </div>
                         </div>
 
-                        {/* Serial Number */}
-                        <div className="inline-block px-3 py-1 bg-white/20 rounded-lg mb-3">
-                            <span className="text-white font-mono text-sm sm:text-base">{product.sn}</span>
-                        </div>
-
-                        {/* Product Name */}
-                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 leading-tight px-2">
-                            {product.productName}
-                        </h1>
-
-                        {/* Quick Info Tags */}
-                        <div className="flex flex-wrap justify-center gap-2 mt-4">
-                            <span className="px-3 py-1.5 bg-white/20 rounded-lg text-white text-xs sm:text-sm flex items-center gap-1.5">
-                                <Tag size={12} />
-                                {product.category}
-                            </span>
-                            <span className="px-3 py-1.5 bg-white/20 rounded-lg text-white text-xs sm:text-sm flex items-center gap-1.5">
-                                <Building2 size={12} />
-                                {product.brand}
-                            </span>
-                            <span className="px-3 py-1.5 bg-white/20 rounded-lg text-white text-xs sm:text-sm flex items-center gap-1.5">
-                                <Globe size={12} />
-                                {product.origin}
-                            </span>
+                        {/* Right: Status Badge */}
+                        <div className="shrink-0">
+                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur border border-white/10">
+                                {isActive ? (
+                                    <CheckCircle size={12} className="text-green-300" />
+                                ) : (
+                                    <XCircle size={12} className="text-red-200" />
+                                )}
+                                <span className="text-xs font-semibold text-white">
+                                    {product.status}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+            <div className="max-w-2xl mx-auto px-4 py-6 space-y-4 flex-1 w-full overflow-y-auto">
 
                 {/* Key Metrics - 2x2 Grid on Mobile */}
-                <div className="grid grid-cols-2 gap-3 -mt-10 relative z-10">
+                <div className="grid grid-cols-2 gap-3 relative z-10">
                     <MetricCard
                         label="Cost"
                         value={`₹${parseInt(product.cost).toLocaleString()}`}
@@ -154,6 +141,28 @@ const ProductView = () => {
                     <InfoRow label="Residual" value={`₹${parseInt(product.residualValue).toLocaleString()}`} />
                 </InfoCard>
 
+                {/* Repair & Parts Details Card */}
+                <InfoCard title="Repair & Parts History" icon={Wrench} color="bg-rose-500">
+                    <InfoRow label="Last Repair" value={product.lastRepairDate} />
+                    <InfoRow label="Last Cost" value={product.repairCost ? `₹${product.repairCost}` : '-'} />
+                    <InfoRow label="Parts Changed?" value={product.partChanged} highlight={product.partChanged === 'Yes'} />
+                    <InfoRow label="Total Repairs" value={product.repairCount} />
+                    <InfoRow label="Total Cost" value={product.totalRepairCost ? `₹${product.totalRepairCost}` : '-'} />
+
+                    {product.partNames && product.partNames.length > 0 && (
+                        <div className="mt-3 pt-3 border-t border-slate-100">
+                            <p className="text-xs text-slate-500 mb-2">Parts Replaced</p>
+                            <div className="flex flex-wrap gap-2">
+                                {product.partNames.map((part, index) => (
+                                    <span key={index} className="px-2 py-1 bg-rose-50 text-rose-700 rounded-md text-xs font-medium border border-rose-100">
+                                        {part}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </InfoCard>
+
                 {/* Notes Card */}
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div className="px-4 py-3 border-b border-slate-100 flex items-center gap-3 bg-slate-50">
@@ -179,8 +188,8 @@ const ProductView = () => {
                     </div>
                 </div>
 
-                {/* Footer */}
-                <div className="text-center py-6 border-t border-slate-200 mt-6">
+                {/* Record Info Footer - Simplified */}
+                <div className="text-center py-4 mt-6 opacity-60 hover:opacity-100 transition-opacity">
                     <div className="flex items-center justify-center gap-2 text-slate-400 text-xs mb-1">
                         <Calendar size={12} />
                         Created {new Date(product.createdDate).toLocaleDateString('en-IN', {
@@ -193,9 +202,9 @@ const ProductView = () => {
                         by {product.createdBy}
                     </p>
                 </div>
-
-                <Footer />
             </div>
+
+            <Footer />
         </div>
     );
 };
